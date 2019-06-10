@@ -63,6 +63,14 @@ void AnalyzeRunner::run() const
 
   const auto experiment_start = std::chrono::steady_clock::now();
 
+  int fd;
+  char * myfifo = "/tmp/benchmark";
+
+  /* create the FIFO (named pipe) */
+  mkfifo(myfifo, 0666);
+  fd = open(myfifo, O_RDWR | O_APPEND | O_NONBLOCK);
+  m_ec.log("FIFO Created");
+
   while (!check_exit(experiment_start)) {
     const auto loop_start = std::chrono::steady_clock::now();
 
@@ -132,7 +140,8 @@ void AnalyzeRunner::analyze(
     StatisticsTracker(ltr_sub_vec)
   );
 
-  m_ec.log(result.to_csv_string(true));
+  //m_ec.log(result.to_csv_string(true));
+  result.to_pipe(fd, true);
 }
 
 bool AnalyzeRunner::check_exit(std::chrono::steady_clock::time_point experiment_start) const

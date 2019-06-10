@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <string>
 #include <iostream>
+#include <ctime>
 
 namespace performance_test
 {
@@ -67,6 +68,7 @@ std::string AnalysisResult::csv_header(const bool pretty_print, std::string st)
 
   std::stringstream ss;
   ss << "T_experiment" << st;
+  ss << "T_timestamp" << st;
   ss << "T_loop" << st;
   ss << "received" << st;
   ss << "sent" << st;
@@ -120,6 +122,7 @@ std::string AnalysisResult::to_csv_string(const bool pretty_print, std::string s
 
   ss << std::fixed;
   ss << m_experiment_start.count() << st;
+  ss << std::time(0) << st;
   ss << m_loop_start.count() << st;
   ss << std::setprecision(0);
   ss << m_num_samples_received << st;
@@ -170,6 +173,24 @@ std::string AnalysisResult::to_csv_string(const bool pretty_print, std::string s
   ss << m_sys_usage.ru_nivcsw << st;
 
   return ss.str();
+}
+
+std::string AnalysisResult::to_pipe(int fd, const bool pretty_print, std::string st) const
+{
+    std::stringstream ss;
+
+    if (m_latency.min() != std::numeric_limits<double>::max() && m_latency.min() != -std::numeric_limits<double>::max()
+        && m_latency.max() != std::numeric_limits<double>::max() && m_latency.max() != -std::numeric_limits<double>::max() )
+    {
+        ss << "min.value " << std::time(0) << ":" << m_latency.min() * 1000.0 << st;
+        ss << "max.value " << std::time(0) << ":" << m_latency.max() * 1000.0 << st;
+        ss << "mean.value " << std::time(0) << ":" << m_latency.mean() * 1000.0 << st;
+
+        write(fd, ss.str().c_str(), (ss.str().length()));
+    }
+
+    return ss.str();
+
 }
 
 }  // namespace performance_test
