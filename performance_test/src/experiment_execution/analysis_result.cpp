@@ -19,6 +19,14 @@
 #include <iostream>
 #include <ctime>
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <math.h>
+
+
 namespace performance_test
 {
 
@@ -174,7 +182,6 @@ std::string AnalysisResult::to_csv_string(const bool pretty_print, std::string s
 
   return ss.str();
 }
-
 std::string AnalysisResult::to_pipe(int fd, const bool pretty_print, std::string st) const
 {
     std::stringstream ss;
@@ -192,5 +199,4 @@ std::string AnalysisResult::to_pipe(int fd, const bool pretty_print, std::string
     return ss.str();
 
 }
-
 }  // namespace performance_test
